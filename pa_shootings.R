@@ -117,6 +117,4 @@ data %>% group_by(state) %>% summarise(total = sum(count)) %>% ungroup() %>% arr
 data %>% group_by(city) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #top 10 cities
 data %>% group_by(race) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #by race
 
-(state <- ggplot(data, aes(x=reorder(state, -count), y=count, fill = state.flag)) + 
-  geom_bar(stat="identity") + labs(x="", y="Number of Shootings") + guides(fill=FALSE) + theme_bg + 
-  coord_flip())
+pa <- data %>% filter(state == "PA")

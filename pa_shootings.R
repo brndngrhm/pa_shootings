@@ -7,6 +7,9 @@ library(lubridate)
 library(ggthemes)
 library(RCurl)
 library(rvest)
+library(extrafont)
+library(ggthemes)
+library(grid)
 
 #loads and formats data----
 
@@ -50,6 +53,70 @@ data <- left_join(data, states, by = "state")
 data$state <- as.factor(data$state)
 str(data)
 
+#ggplot theme----
+
+#Import and list fonts
+loadfonts(device="win")
+
+#Fonts to plug into font.type variable
+"Lucida Sans"
+"Gil Sans MT"
+"Verdana"
+"Trebuchet MS"
+"Georgia"
+"Garamond"
+
+#Global theme options - to easily all plots at once
+font.type <- "Garamond"
+background.color <- "#f1f1f1"
+line.color <- "#d8d8d8"
+title.color <- "#3C3C3C"
+title.size <- 22
+axis.color <- "#535353"
+axis.size <- 14
+
+transparency <- .7 #for alpha
+line.size <- 1.6 #for geom_line()
+point.size <- 3 #for geom_point()
+
+#theme
+theme_bg <-theme(panel.background=element_rect(fill=background.color)) + 
+  theme(plot.background=element_rect(fill=background.color)) +
+  theme(panel.grid.major=element_line(colour=line.color,size=.60)) +
+  theme(panel.grid.minor=element_line(colour=line.color,size=.05)) +
+  theme(axis.ticks=element_blank()) +
+  theme(plot.title=element_text(face="bold",vjust=2, hjust=-.07, colour=title.color,size=title.size)) +
+  theme(axis.text.x=element_text(size=axis.size,colour=axis.color)) +
+  theme(axis.text.y=element_text(size=axis.size,colour=axis.color)) +
+  theme(axis.title.y=element_text(size=axis.size,colour=axis.color,vjust=1.5)) +
+  theme(axis.title.x=element_text(size=axis.size,colour=axis.color,vjust=-.5)) +
+  theme(text=element_text(family=font.type))
+
+#theme options (to add plots inividually)
+
+#to add bold line at y=0
+geom_hline(yintercept=0,size=1.2,colour="#535353")
+
+#to change plot margins
+theme(plot.margin = unit(c(1, 1, .5, .7), "cm"))
+
+#to get rid of legend
+theme(legend.position="none")
+guides(fill = FALSE)
+
+#to format legend when it's needed
+theme(legend.background = element_rect(fill=background.color)) + 
+  theme(legend.key = element_rect(colour = background.color)) + 
+  theme(legend.direction = "horizontal", legend.position = "bottom")
+
 
 #exploration and plots----
-(state <- ggplot(data, aes(x=reorder(state, count), y=count, fill = state.flag)) + geom_bar(stat = "identity"))
+
+sum(data$count) #total shootings
+data %>% group_by(state) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #top 10 states
+data %>% group_by(city) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #top 10 cities
+data %>% group_by(race) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #by race
+
+(state <- ggplot(data, aes(x=reorder(state, -count), y=count, fill = state.flag)) + 
+  geom_bar(stat="identity") + labs(x="", y="Number of Shootings") + guides(fill=FALSE) + theme_bg + 
+  coord_flip())

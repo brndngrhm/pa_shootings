@@ -1,4 +1,4 @@
-#PA Shootings Script
+#Fatal Police Shootings Script
 
 #packages----
 library(dplyr)
@@ -144,48 +144,49 @@ per.capita$pop.thousands <- per.capita$pop/100000
 per.capita$per.cap.thousands <- per.capita$total/per.capita$pop.thousands
 
 (per.cap.plot <- ggplot(per.capita, aes(x=reorder(state, per.cap.thousands), y=per.cap.thousands, fill = race)) + 
-  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + labs(x="", y="Shootings by Police per 100,000") + coord_flip() + theme_bg)
+  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + labs(x="", y="Fatal Shootings by Police per 100,000 Residents") + coord_flip() + theme_bg)
 
 (year.plot <- ggplot(year, aes(x=(reorder(year,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
-  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+  labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
 (state.plot <- ggplot(state, aes(x=(reorder(state,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
-  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+  labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
 (city.plot <- ggplot(city, aes(x=(reorder(city,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
-  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+  labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
 (race.plot <- ggplot(race, aes(x=(reorder(race2,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
-  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+  labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
 (age.plot <- ggplot(age, aes(x=(reorder(age2,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
-  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+  labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
 (mental.illness.plot <- ggplot(mental.illness, aes(x=(reorder(signs_of_mental_illness,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
-  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+  labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
 (armed.plot <- ggplot(armed, aes(x=(reorder(armed,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
-  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+  labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
 (threat.plot <- ggplot(threat.level, aes(x=(reorder(threat_level,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
-  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+  labs(x="", y="Fatal Shootings by Police") + coord_flip() + theme_bg)
 
 (manner.plot <- ggplot(manner.of.death, aes(x=(reorder(manner_of_death,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
-  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+  labs(x="", y="Fatal hootings by Police") + coord_flip() + theme_bg)
 
 
 #groups by date and makes date plot
 date <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
+
 (time.plot <- ggplot(date, aes(x=month, y=total)) + facet_grid(.~year)+ 
  geom_bar(stat="identity", alpha=transparency, fill = "dodgerblue") + 
-  labs(x="", y="Shootings by Police") + theme_bg + 
+  labs(x="", y="Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)))

@@ -28,6 +28,23 @@ data$year <- year(data$date)
 data$year <- as.factor(data$year)
 data$day <- wday(data$date, label = TRUE, abbr = TRUE)
 data$count <- 1
+data$age[is.na(data$age)] <- 0
+
+#re-codes race as white, black hispanic, other
+data$race2 <- "Other"
+data$race2[data$race == "W"] <- "White"
+data$race2[data$race == "B"] <- "Black"
+data$race2[data$race == "H"] <- "Hispanic"
+data$race2[data$race == " "] <- "Unknown"
+data$race2 <- as.factor(data$race2)
+
+#creates age buckets
+data$age2 <- "Under 18"
+data$age2[18 <= data$age & data$age < 30] <- "18 to 29"
+data$age2[30 <= data$age & data$age < 45] <- "30 to 44"
+data$age2[45 <= data$age] <- "45 and Older"
+data$age2[data$age == 0] <- "Unknown"
+data$age2 <- as.factor(data$age2)
 
 #loads and checks structure
 View(data)
@@ -67,7 +84,7 @@ loadfonts(device="win")
 "Garamond"
 
 #Global theme options - to easily all plots at once
-font.type <- "Garamond"
+font.type <- "Verdana"
 background.color <- "#f1f1f1"
 line.color <- "#d8d8d8"
 title.color <- "#3C3C3C"
@@ -109,12 +126,58 @@ theme(legend.background = element_rect(fill=background.color)) +
   theme(legend.key = element_rect(colour = background.color)) + 
   theme(legend.direction = "horizontal", legend.position = "bottom")
 
-
 #exploration and plots----
+total <- sum(data$count) #total shootings
+year <- data %>% group_by(year) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by year
+state <- data %>% group_by(state) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #top 10 states
+city <- data %>% group_by(city) %>% summarise(total = sum(count)) %>% top_n(20) %>% arrange(desc(total)) #top 10 cities
+race <- data %>% group_by(race2) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by race
+age <- data %>% group_by(age2) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by race
+mental.illness <- data %>% group_by(signs_of_mental_illness) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by signs of mental illness
+armed <- data %>% group_by(armed) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by victim weapon type
+threat.level <- data %>% group_by(threat_level) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by threat level
+manner.of.death <- data %>% group_by(manner_of_death) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #manner of death
 
-sum(data$count) #total shootings
-data %>% group_by(state) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #top 10 states
-data %>% group_by(city) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #top 10 cities
-data %>% group_by(race) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #by race
+#new dataframe of shootings by state per 100,000 
+per.capita <- data %>% select(state, count, pop) %>% group_by(state, pop) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total))
+per.capita$pop.thousands <- per.capita$pop/100000
+per.capita$per.cap.thousands <- per.capita$total/per.capita$pop.thousands
 
-pa <- data %>% filter(state == "PA")
+(per.cap.plot <- ggplot(per.capita, aes(x=reorder(state, per.cap.thousands), y=per.cap.thousands, fill = race)) + 
+  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + labs(x="", y="Shootings by Police per 100,000") + coord_flip() + theme_bg)
+
+(year.plot <- ggplot(year, aes(x=(reorder(year,total)), y=total)) + 
+  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
+  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+
+(state.plot <- ggplot(state, aes(x=(reorder(state,total)), y=total)) + 
+  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
+  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+
+(city.plot <- ggplot(city, aes(x=(reorder(city,total)), y=total)) + 
+  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
+  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+
+(race.plot <- ggplot(race, aes(x=(reorder(race2,total)), y=total)) + 
+  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
+  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+
+(age.plot <- ggplot(age, aes(x=(reorder(age2,total)), y=total)) + 
+  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
+  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+
+(mental.illness.plot <- ggplot(mental.illness, aes(x=(reorder(signs_of_mental_illness,total)), y=total)) + 
+  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
+  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+
+(armed.plot <- ggplot(armed, aes(x=(reorder(armed,total)), y=total)) + 
+  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
+  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+
+(threat.plot <- ggplot(threat.level, aes(x=(reorder(threat_level,total)), y=total)) + 
+  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
+  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+
+(manner.plot <- ggplot(manner.of.death, aes(x=(reorder(manner_of_death,total)), y=total)) + 
+  geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
+  labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)

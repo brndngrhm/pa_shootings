@@ -181,3 +181,11 @@ per.capita$per.cap.thousands <- per.capita$total/per.capita$pop.thousands
 (manner.plot <- ggplot(manner.of.death, aes(x=(reorder(manner_of_death,total)), y=total)) + 
   geom_bar(stat = "identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Shootings by Police") + coord_flip() + theme_bg)
+
+
+#groups by date and makes date plot
+date <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
+(time.plot <- ggplot(date, aes(x=month, y=total)) + facet_grid(.~year)+ 
+ geom_bar(stat="identity", alpha=transparency, fill = "dodgerblue") + 
+  labs(x="", y="Shootings by Police") + theme_bg + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)))

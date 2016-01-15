@@ -71,14 +71,13 @@ data <- left_join(data, states, by = "state")
 data$state <- as.factor(data$state)
 str(data)
 
-#creates dataframe of list of date to fill in date gaps
+#creates dataframe of list of dates to fill in date gaps
 date.ref <- data.frame(date=seq(as.Date("2015-01-01"), as.Date("2016-01-15"), by="days"))
 date.ref$date <- ymd(date.ref$date)
 
 #joins data and date.ref dataframes and replaces na with 0's
 data <- merge(data,date.ref,by.x='date',by.y='date',all.x=T,all.y=T)
 data$count[is.na(data$count)] <- 0
-
 
 #ggplot theme----
 
@@ -138,18 +137,18 @@ theme(legend.background = element_rect(fill=background.color)) +
 
 #exploration and plots----
 total <- sum(data$count) #total shootings
-year <- data %>% group_by(year) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by year
-state <- data %>% group_by(state) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #top 10 states
-city <- data %>% group_by(city) %>% summarise(total = sum(count)) %>% top_n(20) %>% arrange(desc(total)) #top 10 cities
-race <- data %>% group_by(race2) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by race
-age <- data %>% group_by(age2) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by race
-mental.illness <- data %>% group_by(signs_of_mental_illness) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by signs of mental illness
-armed <- data %>% group_by(armed) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by victim weapon type
-threat.level <- data %>% group_by(threat_level) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by threat level
-manner.of.death <- data %>% group_by(manner_of_death) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #manner of death
+year <- data %>% filter(count > 0) %>% group_by(year) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by year
+state <- data %>% filter(count > 0) %>% group_by(state) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #top 10 states
+city <- data %>%filter(count > 0) %>% group_by(city) %>% summarise(total = sum(count)) %>% top_n(20) %>% arrange(desc(total)) #top 10 cities
+race <- data %>%filter(count > 0) %>% group_by(race2) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by race
+age <- data %>% filter(count > 0) %>% group_by(age2) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by race
+mental.illness <- data %>%filter(count > 0) %>% group_by(signs_of_mental_illness) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by signs of mental illness
+armed <- data %>% filter(count > 0) %>% group_by(armed) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by victim weapon type
+threat.level <- data %>% filter(count > 0) %>% group_by(threat_level) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #shootings by threat level
+manner.of.death <- data %>% filter(count > 0) %>% group_by(manner_of_death) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total)) #manner of death
 
 #new dataframe of shootings by state per 100,000 
-per.capita <- data %>% select(state, count, pop) %>% group_by(state, pop) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total))
+per.capita <- data %>% filter(count > 0) %>% select(state, count, pop) %>% group_by(state, pop) %>% summarise(total = sum(count)) %>% ungroup() %>% arrange(desc(total))
 per.capita$pop.thousands <- per.capita$pop/100000
 per.capita$per.cap.thousands <- per.capita$total/per.capita$pop.thousands
 

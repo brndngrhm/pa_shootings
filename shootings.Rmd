@@ -1,0 +1,7 @@
+---
+title: "Time Series Analysis of Fatal Police Shootings"
+author: "Brendan Graham"
+date: "January 15, 2016"
+output: html_document
+---
+test

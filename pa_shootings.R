@@ -184,9 +184,18 @@ per.capita$per.cap.thousands <- per.capita$total/per.capita$pop.thousands
 
 
 #groups by date and makes date plot
-date <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
+month <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
 
-(date.plot <- ggplot(date, aes(x=month, y=total)) + facet_grid(.~year)+ 
+(month.plot <- ggplot(month, aes(x=month, y=total)) + facet_grid(.~year)+ 
  geom_bar(stat="identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)))
+
+date <- data %>% group_by(date, count) %>% summarise(total = sum(count))
+
+(date.plot <- ggplot(date, aes(x=date, y=total)) + 
+  geom_point(size=3) + geom_line(size=0.04) + 
+  labs(x="", y="Fatal Shootings by Police") + theme_bg + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)) + 
+  scale_x_datetime(breaks = ("1 month")))
+

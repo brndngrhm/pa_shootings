@@ -66,9 +66,19 @@ states$pop <- as.numeric(states$pop)
 View(states)
 str(states)
 
+#joins shooting and population data
 data <- left_join(data, states, by = "state")
 data$state <- as.factor(data$state)
 str(data)
+
+#creates dataframe of list of date to fill in date gaps
+date.ref <- data.frame(date=seq(as.Date("2015-01-01"), as.Date("2016-01-15"), by="days"))
+date.ref$date <- ymd(date.ref$date)
+
+#joins data and date.ref dataframes and replaces na with 0's
+data <- merge(data,date.ref,by.x='date',by.y='date',all.x=T,all.y=T)
+data$count[is.na(data$count)] <- 0
+
 
 #ggplot theme----
 
@@ -186,7 +196,7 @@ per.capita$per.cap.thousands <- per.capita$total/per.capita$pop.thousands
 #groups by date and makes date plot
 month <- data %>% group_by(year, month, count) %>% summarise(total = sum(count))
 
-(month.plot <- ggplot(month, aes(x=month, y=total)) + facet_grid(.~year)+ 
+(month.plot <- ggplot(subset(month, count > 0), aes(x=month, y=total)) + facet_grid(.~year)+ 
  geom_bar(stat="identity", alpha=transparency, fill = "dodgerblue") + 
   labs(x="", y="Fatal Shootings by Police") + theme_bg + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=.35)))
